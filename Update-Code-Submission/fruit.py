@@ -1,35 +1,46 @@
 from flask import Flask, request, jsonify, make_response, abort
 from flask_sqlalchemy import SQLAlchemy
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy.orm import validates
 from util import isInt, formatNumber
+from app.main import create_app, db
+from app.main.model.order import Order
 import datetime
 import os
 
 # Create an instance of web application
-app = Flask(__name__)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] =  'sqlite:///' + os.path.join(basedir, 'fruit.sqlite')
+# app = Flask(__name__)
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# app.config['SQLALCHEMY_DATABASE_URI'] =  'sqlite:///' + os.path.join(basedir, 'fruit.sqlite')
 
-# Initialize database
-db = SQLAlchemy(app)
+# # Initialize database
+# db = SQLAlchemy(app)
+app = create_app(os.getenv('BOILERPLATE_ENV') or 'dev')
 
-class Order(db.Model):
-    __tablename__ = 'order'
-    orderId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    fruitName = db.Column(db.String, nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    date = db.Column(db.Integer, nullable=False)
+manager = Manager(app)
 
-    @validates('quantity')
-    def validate_quantity(self, key, quantity):
-        if quantity <= 0:
-            raise ValueError('Quantity must be greater than 0')
-        return quantity
+migrate = Migrate(app, db)
 
-    def __init__(self, fruitName, quantity, date):
-        self.fruitName = fruitName
-        self.quantity = quantity
-        self.date = date
+manager.add_command('db', MigrateCommand)
+
+# class Order(db.Model):
+#     __tablename__ = 'order'
+#     orderId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     fruitName = db.Column(db.String, nullable=False)
+#     quantity = db.Column(db.Float, nullable=False)
+#     date = db.Column(db.Integer, nullable=False)
+
+#     @validates('quantity')
+#     def validate_quantity(self, key, quantity):
+#         if quantity <= 0:
+#             raise ValueError('Quantity must be greater than 0')
+#         return quantity
+
+#     def __init__(self, fruitName, quantity, date):
+#         self.fruitName = fruitName
+#         self.quantity = quantity
+#         self.date = date
 
 # Endpoint to create new fruit
 @app.route("/order", methods=['POST'])
@@ -72,4 +83,4 @@ def get_report():
     return make_response(jsonify({'error': 'Start date and end date should be value of timestamp or integers'}), 404)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()
