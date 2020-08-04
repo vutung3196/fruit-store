@@ -16,11 +16,21 @@ Make sure you run the initial migration commands to update the database when mod
     > python fruit.py db upgrade
 
 ### View the app ###
-    Open the following Url
+    Open the following Url or other appropriate url in your local machine after building app 
     http://localhost:5000/
-    Using following api to place an order and get report
+    Using following api to place an order
     http://localhost:5000/order (POST)
-    http://localhost:5000/report?from=1&to=10 (GET)
+    with json sample 
+    {
+        "date": 3,
+        "fruits": {
+        "orange": 10,
+        "apple": 3,
+        "coconut": 10
+        }
+    }
+    Use this following api to get report
+    http://localhost:5000/report?from={a}&to={b} (GET) where a and b are integer
 
 ### Docker ###
     Run following commands to create docker image
@@ -28,4 +38,6 @@ Make sure you run the initial migration commands to update the database when mod
     > docker run -p 5001:5000 -d fruit-store-application
     Check docker container
     > docker container ls
-    > open docker desktop and view url to test
+    > open docker desktop (Windows 10) and view url to test or open docker log to view url: 
+    > docker container ls
+    > docker container logs [container id]
