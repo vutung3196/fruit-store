@@ -5,7 +5,7 @@ from flask import Blueprint
 
 api = Blueprint('api', __name__, template_folder='templates')
 
-# Endpoint to create new fruit
+# Endpoint to place new order
 @api.route("/order", methods=['POST'])
 def place_order():
     if not request.json or not 'fruits' in request.json or not 'date' in request.json:
